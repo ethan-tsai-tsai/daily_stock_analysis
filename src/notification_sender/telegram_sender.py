@@ -14,6 +14,7 @@ import re
 
 from src.config import Config
 from src.formatters import strip_hidden_markdown_metadata
+from src.notification_sender._zh_tw import to_traditional
 
 
 logger = logging.getLogger(__name__)
@@ -63,6 +64,9 @@ class TelegramSender:
         Returns:
             是否发送成功
         """
+        # 上游沒有繁中語系，統一在推播出口轉成台灣正體（非中文內容為 no-op）
+        content = to_traditional(content)
+
         target_chat_id = chat_id if chat_id is not None else self._telegram_config.get("chat_id")
         target_message_thread_id = (
             message_thread_id
