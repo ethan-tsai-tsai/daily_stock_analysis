@@ -1,3 +1,7 @@
+{%- macro strip_price_value(v) -%}
+{%- set v = (v.split('（')[0].split('(')[0].replace('元', '')|trim) if v else v -%}
+{{- v if v else 'N/A' -}}
+{%- endmacro -%}
 🎯 {{ report_date }} {{ labels.dashboard_title }}
 {{ labels.analyzed_prefix }} {{ results|length }} {{ labels.stock_unit }} | 🟢{{ labels.buy_label }}:{{ buy_count }} 🟡{{ labels.watch_label }}:{{ hold_count }} 🔴{{ labels.sell_label }}:{{ sell_count }}
 {%- if market_status_line %}
@@ -16,15 +20,15 @@
 {%- if one|length > 80 %}
 {%- set one = one[:80] ~ '…' %}
 {%- endif %}
-{%- set buy = clean_sniper(sniper.get('ideal_buy')) %}
-{%- set stop = clean_sniper(sniper.get('stop_loss')) %}
-{%- set target = clean_sniper(sniper.get('take_profit')) %}
+{%- set buy = strip_price_value(clean_sniper(sniper.get('ideal_buy'))) %}
+{%- set stop = strip_price_value(clean_sniper(sniper.get('stop_loss'))) %}
+{%- set target = strip_price_value(clean_sniper(sniper.get('take_profit'))) %}
 {{ e.signal_emoji }} **{{ e.stock_name }}({{ e.result.code }})** | {{ e.signal_text }} | {{ labels.score_label }} {{ e.result.sentiment_score }} | {{ e.localized_trend_prediction }}
 {%- if one %}
 {{ one }}
 {%- endif %}
 {%- if buy != 'N/A' or stop != 'N/A' or target != 'N/A' %}
-🎯{{ labels.ideal_buy_label }} {{ buy }} ／ 🛑{{ labels.stop_loss_label }} {{ stop }} ／ 🎊{{ labels.take_profit_label }} {{ target }}
+🎯 {{ buy }} ／ 🛑 {{ stop }} ／ 🎊 {{ target }}
 {%- endif %}
 {% endfor %}
 **{{ labels.generated_at_label }}：{{ report_timestamp }}**
