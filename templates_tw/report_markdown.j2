@@ -20,7 +20,7 @@
 🎯{{ labels.ideal_buy_label }} {{ buy }} ／ 🛑{{ labels.stop_loss_label }} {{ stop }} ／ 🎊{{ labels.take_profit_label }} {{ target }}
 {%- endif %}
 {% endfor %}
-*{{ labels.generated_at_label }}：{{ report_timestamp }}*
+**{{ labels.generated_at_label }}：{{ report_timestamp }}**
 {%- if show_llm_model and models_used %}
-*{{ labels.analysis_model_label }}：{{ models_used|join(', ') }}*
+**{{ labels.analysis_model_label }}：{{ models_used|join(', ') }}**
 {%- endif %}
