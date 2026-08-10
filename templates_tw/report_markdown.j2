@@ -5,10 +5,17 @@
 {%- endif %}
 {% for e in enriched %}
 {%- set dash = e.result.dashboard or {} %}
+{%- set dash = dash if dash is mapping else {} %}
 {%- set core = dash.get('core_conclusion') or {} %}
+{%- set core = core if core is mapping else {} %}
 {%- set battle = dash.get('battle_plan') or {} %}
+{%- set battle = battle if battle is mapping else {} %}
 {%- set sniper = battle.get('sniper_points') or {} %}
-{%- set one = core.get('one_sentence') or e.result.analysis_summary or '' %}
+{%- set sniper = sniper if sniper is mapping else {} %}
+{%- set one = (core.get('one_sentence') or e.result.analysis_summary or '')|string %}
+{%- if one|length > 80 %}
+{%- set one = one[:80] ~ '…' %}
+{%- endif %}
 {%- set buy = clean_sniper(sniper.get('ideal_buy')) %}
 {%- set stop = clean_sniper(sniper.get('stop_loss')) %}
 {%- set target = clean_sniper(sniper.get('take_profit')) %}

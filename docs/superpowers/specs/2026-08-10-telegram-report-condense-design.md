@@ -1,8 +1,12 @@
 # 個股日報推播精簡化設計
 
 - 日期：2026-08-10
-- 狀態：待實作
-- 影響範圍：本 fork 的 Telegram 每日推播（個股日報）
+- 狀態：已實作並驗收（2026-08-10）
+- 影響範圍：`generate_dashboard_report()`（個股日報的產生器），非僅推播出口。
+  其產出同時餵給三個消費端 —— Telegram 推播、存檔的
+  `reports/report_YYYYMMDD.md`（workflow 以 `actions/upload-artifact` 上傳，保留
+  30 天）、以及飛書雲文件（`main.py:999,1046`）。啟用 renderer 後三者都改吃精簡版，
+  完整版詳細報告在系統中已不再產生於任何地方。
 
 ## 問題
 
@@ -178,6 +182,22 @@ REPORT_TEMPLATES_DIR: ${{ vars.REPORT_TEMPLATES_DIR || 'templates_tw' }}
 
 第 1 步驗證模板語法與欄位路徑，第 2 步才是真正的驗收 —— 因為假 context
 無法保證與線上 `AnalysisResult` 完全一致。
+
+## 取捨說明：完整版報告不再產生於任何地方
+
+短路點在產生器 `generate_dashboard_report()`，不是推播出口。啟用 renderer
+（`REPORT_RENDERER_ENABLED=true` + `REPORT_TEMPLATES_DIR=templates_tw`）之後，
+所有呼叫這個產生器的路徑都改吃 `templates_tw/report_markdown.j2` 的精簡輸出：
+
+- Telegram 推播（本案原始需求）
+- 存檔於 `reports/report_YYYYMMDD.md` 的本地報告檔——workflow 用
+  `actions/upload-artifact` 上傳、保留 30 天，**這份 artifact 現在也只有精簡版**
+- 飛書雲文件（`main.py:999,1046` 呼叫同一個 `generate_aggregate_report`）
+
+也就是說，完整版的詳細報告（數據透視、訊號歸因、多策略綜合等本次移除的區塊）
+**在系統中已不再產生於任何地方**，不是只有 Telegram 訊息變短、其餘管道仍留一份
+完整版可查。如果日後需要完整版存檔（例如事後覆盤、稽核），需要另外設計保留路徑，
+本次沒有做。
 
 ## 範圍界線（本次不做）
 
